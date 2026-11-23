@@ -16,27 +16,26 @@ def run_py(code, env=None, cwd=ROOT):
 
 class LoudFailures(unittest.TestCase):
     def test_invalid_value_is_fatal_86(self):
-        r = run_py("from emu import pyemu; pyemu.configure(0x400000)", {"OMH_RUST": "bogus"})
+        r = run_py("from ofh.emu import pyemu; pyemu.configure(0x400000)", {"OMH_RUST": "bogus"})
         self.assertEqual(r.returncode, 86, r.stderr)
         self.assertIn("is not 0, 1 or dual", r.stderr)
 
     def test_missing_build_is_fatal_86_not_a_python_run(self):
         """copy the python sources WITHOUT the built module: a run that asks for Rust must die with 86"""
         with tempfile.TemporaryDirectory() as d:
-            for pkg in ("emu", "mem", "difftest"):
-                shutil.copytree(os.path.join(ROOT, pkg), os.path.join(d, pkg),
-                                ignore=shutil.ignore_patterns("_rs_emu*", "target", "__pycache__", "*.pyd", "*.so"))
-            r = run_py("from emu import pyemu; pyemu.configure(0x400000); print('RAN PURE PYTHON')", {"OMH_RUST": "1"}, cwd=d)
+            shutil.copytree(os.path.join(ROOT, "ofh"), os.path.join(d, "ofh"),
+                            ignore=shutil.ignore_patterns("_rs_emu*", "target", "__pycache__", "*.pyd", "*.so"))
+            r = run_py("from ofh.emu import pyemu; pyemu.configure(0x400000); print('RAN PURE PYTHON')", {"OMH_RUST": "1"}, cwd=d)
             self.assertEqual(r.returncode, 86, (r.stdout, r.stderr))
             self.assertNotIn("RAN PURE PYTHON", r.stdout)
 
     @needs_rust
     def test_stale_build_is_refused(self):
         """edit a source file in a copy of the crate: its hash no longer equals the compiled-in SRC_SHA"""
-        from emu import rs_shim, rs_srchash
+        from ofh.emu import rs_shim, rs_srchash
         with tempfile.TemporaryDirectory() as d:
             crate = os.path.join(d, "rs_emu")
-            shutil.copytree(os.path.join(ROOT, "emu", "rs_emu"), crate, ignore=shutil.ignore_patterns("target"))
+            shutil.copytree(os.path.join(ROOT, "ofh", "emu", "rs_emu"), crate, ignore=shutil.ignore_patterns("target"))
             self.assertEqual(rs_srchash.src_sha(crate), rs_shim._R.SRC_SHA, "a pristine copy hashes to the compiled-in value")
             with open(os.path.join(crate, "src", "lib.rs"), "a") as f:
                 f.write("\n// edit\n")
@@ -44,12 +43,12 @@ class LoudFailures(unittest.TestCase):
 
     @needs_rust
     def test_core_is_really_native(self):
-        r = run_py("from emu import pyemu, rs_shim; import sys\n"
+        r = run_py("from ofh.emu import pyemu, rs_shim; import sys\n"
                    "sys.path.insert(0, 'examples')\n"
                    "from _common import machine\n"
                    "prog, cpu = machine('s:\\n mov 3,d0\\n add d0,d0\\ne:\\n nop\\n')\n"
                    "cpu.run(prog.labels['s'], {prog.labels['e']})\n"
-                   "assert pyemu.CPU.step.__module__ == 'emu.rs_shim', pyemu.CPU.step.__module__\n"
+                   "assert pyemu.CPU.step.__module__ == 'ofh.emu.rs_shim', pyemu.CPU.step.__module__\n"
                    "assert rs_shim._R.stats()['native'] >= 2, rs_shim._R.stats()\n"
                    "print('native', rs_shim._R.stats()['native'], 'd0', cpu.d[0])", {"OMH_RUST": "1"})
         self.assertEqual(r.returncode, 0, r.stderr)
@@ -59,15 +58,15 @@ class LoudFailures(unittest.TestCase):
 @needs_rust
 class Differential(unittest.TestCase):
     def test_cpu_lockstep_fuzz(self):
-        r = run_py("from difftest import cpufuzz; s, rs = cpufuzz.fuzz_lockstep(250, 5); print(s, rs['native'])")
+        r = run_py("from ofh.difftest import cpufuzz; s, rs = cpufuzz.fuzz_lockstep(250, 5); print(s, rs['native'])")
         self.assertEqual(r.returncode, 0, r.stderr[-2000:])
 
     def test_run_cut_fuzz(self):
-        r = run_py("from difftest import cpufuzz; s, rs = cpufuzz.fuzz_runcut(150, 6); print(s)")
+        r = run_py("from ofh.difftest import cpufuzz; s, rs = cpufuzz.fuzz_runcut(150, 6); print(s)")
         self.assertEqual(r.returncode, 0, r.stderr[-2000:])
 
     def test_memory_fuzz_and_journal(self):
-        r = run_py("from difftest import memfuzz; print(memfuzz.fuzz_mem(60, 7), memfuzz.fuzz_journal(40, 8))")
+        r = run_py("from ofh.difftest import memfuzz; print(memfuzz.fuzz_mem(60, 7), memfuzz.fuzz_journal(40, 8))")
         self.assertEqual(r.returncode, 0, r.stderr[-2000:])
 
     def test_dual_mode_on_examples(self):
@@ -92,7 +91,7 @@ class Differential(unittest.TestCase):
         step, installed before dual captures the reference _step) and require the audit to catch it by value: AssertionError naming the
         mismatch, exit 1.  The same program without the sabotage (test_dual_mode_on_examples) must be clean."""
         code = ("import sys\nsys.path.insert(0, 'examples')\n"
-                "from emu import pyemu as E\n"
+                "from ofh.emu import pyemu as E\n"
                 "orig = E.CPU._step\n"
                 "def bad(self):\n"
                 "    orig(self)\n"
@@ -106,9 +105,9 @@ class Differential(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             r = run_py(code, {"OMH_RUST": "dual", "OMH_DUAL_FAIL": "1", "OMH_DUAL_DIR": d})
         self.assertEqual(r.returncode, 1, (r.stdout, r.stderr[-1500:]))
-        self.assertIn("difftest.dual MISMATCH", r.stderr)
+        self.assertIn("ofh.difftest.dual MISMATCH", r.stderr)
         self.assertNotIn("NOT DETECTED", r.stdout)
-        # and counted (not raised) when OMH_DUAL_FAIL is off, so lane.cmp_runs --dual can fail the run afterwards
+        # and counted (not raised) when OMH_DUAL_FAIL is off, so ofh.lane.cmp_runs --dual can fail the run afterwards
         with tempfile.TemporaryDirectory() as d:
             r = run_py(code, {"OMH_RUST": "dual", "OMH_DUAL_DIR": d})
             import ast

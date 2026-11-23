@@ -4,7 +4,7 @@ import unittest
 
 from _t import E, machine
 
-from mem import pagemem, shm
+from ofh.mem import pagemem, shm
 
 
 class PageMemSemantics(unittest.TestCase):

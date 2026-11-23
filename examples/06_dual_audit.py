@@ -1,5 +1,5 @@
 """Example 6: the dual audit.  Runs a synthetic program under OMH_RUST=dual: every native step / segment is compared with the pure-Python step
-on the same start state (registers, flags, writes, memory delta) and a mismatch fails the run.  Needs the Rust core (python -m emu.build)."""
+on the same start state (registers, flags, writes, memory delta) and a mismatch fails the run.  Needs the Rust core (python -m ofh.emu.build)."""
 import os
 import subprocess
 import sys

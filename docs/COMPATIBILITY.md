@@ -1,7 +1,7 @@
 # Which cameras can this help with?
 
-Short answer: **the emulator core (`emu/`) applies to firmware whose code you care about is MN10300/AM33 machine code; the lane
-(`lane/`), the differential tests (`difftest/` as a method) and the verification method (`docs/method.md`) apply to any firmware or
+Short answer: **the emulator core (`ofh/emu/`) applies to firmware whose code you care about is MN10300/AM33 machine code; the lane
+(`ofh/lane/`), the differential tests (`ofh/difftest/` as a method) and the verification method (`docs/method.md`) apply to any firmware or
 any other project.** This page lists what is known about which Olympus / OM System bodies are in the first group. It is deliberately
 conservative: a row says what a cited source reports, and what *we* checked ourselves is marked.
 
@@ -66,17 +66,17 @@ engine generation [S4] gives the E-M10 Mark I, and the two builds still differ i
    `calls`. If you see that, the main block is AM33 code and `pyemu` can execute it.
 3. Fill `profiles/template.json` (`docs/profile.md`) with the load base you found and run `examples/` against your profile.
 4. Unimplemented mnemonics raise `NotImplementedError` with the address: the core implements the integer subset firmware helper code
-   uses (see the header of `emu/pyemu.py`), not the whole ISA. Add what you need to `pyemu` first, then to the Rust core, and let
+   uses (see the header of `ofh/emu/pyemu.py`), not the whole ISA. Add what you need to `pyemu` first, then to the Rust core, and let
    `difftest` tell you if they disagree.
 
 ## Different ISA, or code on another core
 
 If the code you care about is **not** MN10300 (for example the ARM core of the newest bodies [S7], or another vendor's camera):
 
-* `emu/` does not apply. Do not point it at ARM code: it will fail loudly (unknown mnemonic) rather than guess.
-* `lane/` still applies: the driver runs any command as a stage (RAM gate, per-stage scratch, I/O audit, run comparison).
-* `difftest/` as a *method* still applies: any two implementations of one interpreter (a Python reference and a fast core) can be run in
-  lock-step; the fuzz scaffolding in `difftest/cpufuzz.py` is MN10300-specific but short.
+* `ofh/emu/` does not apply. Do not point it at ARM code: it will fail loudly (unknown mnemonic) rather than guess.
+* `ofh/lane/` still applies: the driver runs any command as a stage (RAM gate, per-stage scratch, I/O audit, run comparison).
+* `ofh/difftest/` as a *method* still applies: any two implementations of one interpreter (a Python reference and a fast core) can be run in
+  lock-step; the fuzz scaffolding in `ofh/difftest/cpufuzz.py` is MN10300-specific but short.
 * `docs/method.md` (negative controls by value, real-path emulation over stubs, dual audit) applies to every firmware-modification
   project.
 

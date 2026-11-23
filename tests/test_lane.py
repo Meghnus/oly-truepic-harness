@@ -7,7 +7,7 @@ import unittest
 
 from _t import ROOT
 
-from lane import cmp_runs, driver, ram, stage
+from ofh.lane import cmp_runs, driver, ram, stage
 
 
 def write(p, text):
@@ -174,7 +174,7 @@ class StageContract(unittest.TestCase):
     def run_stage(self, body):
         with tempfile.TemporaryDirectory() as d:
             script = os.path.join(d, "st.py")
-            write(script, "import sys\nsys.path.insert(0, %r)\nfrom lane import stage\n%s\n" % (ROOT, body))
+            write(script, "import sys\nsys.path.insert(0, %r)\nfrom ofh.lane import stage\n%s\n" % (ROOT, body))
             r = subprocess.run([sys.executable, script], env=dict(os.environ, OMH_RUN=d, OMH_STAGE="st"), capture_output=True, text=True)
             with open(os.path.join(d, "results", "st.json")) as f:
                 return r.returncode, json.load(f)
@@ -209,9 +209,9 @@ class EndToEnd(unittest.TestCase):
                                ("die.py", "import os\nos._exit(86)"),
                                ("w1.py", "open('shared.txt','w').write('1')\nstage.main(lambda c: c.sub('w', True, ['r']))"),
                                ("w2.py", "open('shared.txt','w').write('2')\nstage.main(lambda c: c.sub('w', True, ['r']))")):
-                write(os.path.join(d, name), "import sys\nsys.path.insert(0, %r)\nfrom lane import stage\n%s\n" % (ROOT, body))
+                write(os.path.join(d, name), "import sys\nsys.path.insert(0, %r)\nfrom ofh.lane import stage\n%s\n" % (ROOT, body))
             run = os.path.join(d, "run")
-            r = subprocess.run([sys.executable, "-m", "lane.driver", spec, "--run", run, "--pool", "3", "--settle", "0.2", "--poll", "0.2",
+            r = subprocess.run([sys.executable, "-m", "ofh.lane.driver", spec, "--run", run, "--pool", "3", "--settle", "0.2", "--poll", "0.2",
                                 "--ram-gb", "0.1", "--ram-buf", "0.0"] + list(extra), cwd=ROOT, capture_output=True, text=True)
             with open(os.path.join(run, "summary.json")) as f:
                 return r.returncode, json.load(f), r.stdout
@@ -258,7 +258,7 @@ class EndToEnd(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             spec = os.path.join(d, "spec.json")
             write(spec, json.dumps({"stages": [self.st("a", "ok.py")]}))
-            r = subprocess.run([sys.executable, "-m", "lane.driver", spec, "--run", os.path.join(d, "r"), "--rust", "yes"], cwd=ROOT,
+            r = subprocess.run([sys.executable, "-m", "ofh.lane.driver", spec, "--run", os.path.join(d, "r"), "--rust", "yes"], cwd=ROOT,
                                capture_output=True, text=True)
             self.assertEqual(r.returncode, 86)
 

@@ -6,7 +6,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from emu import asm, pyemu as E          # noqa: E402
+from ofh.emu import asm, pyemu as E          # noqa: E402
 
 BASE = 0x400000            # arbitrary: nothing here is an address of any real camera
 

@@ -7,7 +7,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from emu import asm, pyemu as E          # noqa: E402
+from ofh.emu import asm, pyemu as E          # noqa: E402
 
 BASE = 0x400000
 
@@ -23,10 +23,10 @@ def machine(src, base=BASE, data=0x1000):
 
 def rust_built():
     try:
-        from emu import rs_shim          # noqa: F401
+        from ofh.emu import rs_shim          # noqa: F401
         return True
     except ImportError:
         return False
 
 
-needs_rust = unittest.skipUnless(rust_built(), "Rust core not built (python -m emu.build)")
+needs_rust = unittest.skipUnless(rust_built(), "Rust core not built (python -m ofh.emu.build)")

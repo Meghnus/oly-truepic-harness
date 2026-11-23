@@ -2,7 +2,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from lane import stage          # noqa: E402
+from ofh.lane import stage          # noqa: E402
 
 
 def run(ctx):

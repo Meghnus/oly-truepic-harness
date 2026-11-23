@@ -5,7 +5,7 @@ import unittest
 
 from _t import ROOT, E
 
-from emu import profile
+from ofh.emu import profile
 
 
 class Profiles(unittest.TestCase):
@@ -75,7 +75,7 @@ class Profiles(unittest.TestCase):
 class External(unittest.TestCase):
     def test_external_disassembler_parses_and_caches(self):
         import sys
-        from emu import disasm
+        from ofh.emu import disasm
         script = ("import sys\nprint('00400000 mov 5,d0 ; 01 02 03')\nprint('00400003 add d0,d0 ; 04 05')\nprint('junk line')\n")
         with tempfile.TemporaryDirectory() as d:
             sp = os.path.join(d, "fake_dis.py")
@@ -96,7 +96,7 @@ class External(unittest.TestCase):
             img.close()
 
     def test_regex_needs_named_groups(self):
-        from emu import disasm
+        from ofh.emu import disasm
         with self.assertRaises(ValueError):
             disasm.ExternalDisassembler(["x"], line_regex=r"(\d+)")
 

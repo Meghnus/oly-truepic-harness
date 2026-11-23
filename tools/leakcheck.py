@@ -21,7 +21,7 @@ tables.  The licence of the firmware forbids redistributing it or anything deriv
     python tools/leakcheck.py --stock path/to/your_stock.BIN
     python tools/leakcheck.py --list-addresses          # print every address-like literal with file:line (to maintain the allowlist)
 
-Only the standard library is used.  Nothing is written anywhere.  Build outputs (emu/rs_emu/target, *.pyd, .omh_cache) are skipped when the
+Only the standard library is used.  Nothing is written anywhere.  Build outputs (ofh/emu/rs_emu/target, *.pyd, .omh_cache) are skipped when the
 repository is not a git checkout; in a git checkout exactly the files git would commit are checked (tracked + untracked, not ignored).
 """
 import argparse

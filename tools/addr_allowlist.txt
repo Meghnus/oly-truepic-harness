@@ -4,8 +4,8 @@
 
 *  0xffffffff|0x7fffffff|0x80000000|0x100000000|0xffffff00   # 32-bit arithmetic masks and signed-boundary edge values (ISA constants, used by the core and by the fuzzers' edge-value lists)
 *  0x400000|0x10000000|0x10001000|0x10008000|0x10010000|0x10000100   # synthetic image base / data / stack addresses of the examples and tests: arbitrary, chosen only to be distinct, not an address of any camera
-difftest/cpufuzz.py 0x20000|0x22000   # offset of the generated code inside the synthetic random image and the image size (0x22000 bytes of random data)
-difftest/memfuzz.py 0x12344000|0x30004000   # arbitrary page-boundary / range probe bases for the memory fuzzer
+ofh/difftest/cpufuzz.py 0x20000|0x22000   # offset of the generated code inside the synthetic random image and the image size (0x22000 bytes of random data)
+ofh/difftest/memfuzz.py 0x12344000|0x30004000   # arbitrary page-boundary / range probe bases for the memory fuzzer
 tests/test_leakcheck.py 0x12345678   # an arbitrary literal used to test the scanner itself
 tests/*.py 0x900000|0x10000001|0x400003|0x400004   # synthetic addresses of the unit tests (an out-of-image stub address, a misaligned data address, patch offsets inside the synthetic image)
 tests/*.py 0x01020304|0x11223344   # byte-order probe values (not addresses)

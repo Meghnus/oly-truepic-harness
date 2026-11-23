@@ -14,10 +14,10 @@
 *decoded*
 
 # build outputs and local caches (decoded images live in these: never publish)
-emu/rs_emu/target/
-emu/_rs_emu*.pyd
-emu/_rs_emu*.so
-emu/_rs_emu.build.json
+ofh/emu/rs_emu/target/
+ofh/emu/_rs_emu*.pyd
+ofh/emu/_rs_emu*.so
+ofh/emu/_rs_emu.build.json
 .omh_cache/
 __pycache__/
 *.pyc

@@ -11,7 +11,7 @@ A check that cannot fail proves nothing. For every check that says PASS, run the
 **mutant**: the patch with one byte changed, the previous build, the stock image where the stock image must fail) and require it to FAIL
 there. Judge the control **by value**: "the mutant returned 250, the original 100", not "the run printed FAIL somewhere".
 
-* Keep the control in the same stage as the check (`ctx.neg(...)` in `lane/stage.py`), named `NEG ...`, so a run table shows which controls ran
+* Keep the control in the same stage as the check (`ctx.neg(...)` in `ofh/lane/stage.py`), named `NEG ...`, so a run table shows which controls ran
   and a missing control is visible.
 * A control must differ from the check by *one thing*. If the mutant also changes the harness, the verdict means nothing.
 * A control that is not detected is the most valuable result you can get: it says your check is blind to that class of error.
@@ -35,12 +35,12 @@ or in a path nobody emulated.
 
 The Rust core is only useful if it is *exactly* the Python core, just faster. Establish that with three independent layers, in this order:
 
-1. **Differential fuzz** (`difftest/cpufuzz.py`, `difftest/memfuzz.py`): random programs and random memory operations, compared after
+1. **Differential fuzz** (`ofh/difftest/cpufuzz.py`, `ofh/difftest/memfuzz.py`): random programs and random memory operations, compared after
    every step including exception type and message, value *and type* of every register, flags, write audit, trace, memory order.
-2. **Lock-step on your real worlds** (`OMH_RUST=dual`, `difftest/dual.py`): every native step or run segment of your real battery is
+2. **Lock-step on your real worlds** (`OMH_RUST=dual`, `ofh/difftest/dual.py`): every native step or run segment of your real battery is
    re-run by the Python core from the same start state and compared (registers, flags, writes, memory delta, exception). A mismatch is
-   counted and fails the run (`lane.cmp_runs --dual`), or raises at once with `OMH_DUAL_FAIL=1`.
-3. **A/B of the whole battery** (`lane.ab`): the same battery with the Rust core and with pure Python; `lane.cmp_runs` must report 0
+   counted and fails the run (`ofh.lane.cmp_runs --dual`), or raises at once with `OMH_DUAL_FAIL=1`.
+3. **A/B of the whole battery** (`ofh.lane.ab`): the same battery with the Rust core and with pure Python; `ofh.lane.cmp_runs` must report 0
    differences after token normalisation, and every stage that emulates must carry a marker proving the native core executed
    (`native > 0`).
 
@@ -50,8 +50,8 @@ sides secretly ran Python agrees perfectly and proves nothing; that is why the m
 ## 4. The harness fails loudly or not at all
 
 * A run that **requested** the fast core and did not get it (bad value, missing build, stale build, patch failure) must **end with exit
-  86**, not fall back (`emu/loud.py`). A driver treats 86 as FAILED, never as skipped.
-* **A stale build must not run**: the sources are hashed (`emu/rs_srchash.py`), the hash is compiled into the module, and the shim
+  86**, not fall back (`ofh/emu/loud.py`). A driver treats 86 as FAILED, never as skipped.
+* **A stale build must not run**: the sources are hashed (`ofh/emu/rs_srchash.py`), the hash is compiled into the module, and the shim
   recomputes it at import. Edit a `.rs` file and forget to rebuild: import fails.
 * A stage that checks nothing is FAIL. A stage whose process exits non-zero is FAIL even if its rows say PASS.
 * An unknown mnemonic raises `NotImplementedError` with the address; an unknown address raises `KeyError`; an unconfigured core refuses to
@@ -86,9 +86,9 @@ sides secretly ran Python agrees perfectly and proves nothing; that is why the m
   `OMH_ALIGN=1` (the lane sets it) so a misaligned access by emitted code raises `AlignFault`.
 * **An expectation that you edit to make a run pass is a bug.** When a census count changes, find out *why* and change the expectation
   in the same commit that explains it, with the new value derived, not copied from the failing output.
-* **Normalise only what may differ.** `lane.cmp_runs` removes wall-clock numbers, temp names and run-dir paths and nothing else; every
+* **Normalise only what may differ.** `ofh.lane.cmp_runs` removes wall-clock numbers, temp names and run-dir paths and nothing else; every
   pattern is printed with `--show-norm`. Each new pattern is a place a real difference can hide: add them reluctantly.
-* **Memory diet is optional, correctness is not.** `PageMem` and the shared store (`mem/`) exist to fit N stages in RAM. They are
+* **Memory diet is optional, correctness is not.** `PageMem` and the shared store (`ofh/mem/`) exist to fit N stages in RAM. They are
   tested to behave like a `dict` (fuzzed against it), and they are opt-in (`OMH_MEM=page`, `Image.from_file(..., shared=True)`).
 * **Never publish what you decoded.** Decoded images, dumps, disassembly, caches (`.omh_cache/`), patch lists and per-body tables are
   derived from the vendor's firmware. Run `tools/leakcheck.py --stock YOUR.BIN` before every push (`docs/licence-and-leaks.md`).
