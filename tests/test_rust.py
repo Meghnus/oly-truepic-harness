@@ -118,5 +118,30 @@ class Differential(unittest.TestCase):
         self.assertEqual(sum(c["mismatch"] for c in counters), 1, counters)
 
 
+@needs_rust
+class DisShortcut(unittest.TestCase):
+    """the opt-in reviewed-override registry (rs_shim.register_reviewed_dis): same results, but the steps stay NATIVE only for a registered,
+    code-identical function; an edited copy, or no registration, routes every step through Python (correct, slower)"""
+
+    def probe(self, mode):
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "tests", "_dis_probe.py"), mode], cwd=ROOT, capture_output=True, text=True,
+                           env=dict(os.environ, OMH_RUST="1"))
+        self.assertEqual(r.returncode, 0, r.stderr[-1500:])
+        return json.loads(r.stdout.strip().splitlines()[-1])
+
+    def test_registered_override_is_shortcut_and_identical(self):
+        reg, noreg, edited = self.probe("reg"), self.probe("noreg"), self.probe("edited")
+        for p in (reg, noreg, edited):
+            self.assertEqual((p["d0"], p["steps"]), (20100, 604))                 # identical result and step count in every mode
+        self.assertEqual(reg["native"], 604)                                       # every step native, the window served from the side cache
+        self.assertLessEqual(reg["dis_call"], 10)                                  # only the cache misses call Python
+        self.assertEqual(noreg["native"], 0)                                       # unregistered override: all steps through the Python _step
+        self.assertEqual(noreg["fb_route"], 604)
+
+    def test_edited_function_is_not_trusted(self):
+        edited = self.probe("edited")                                              # registered text differs from the loaded code
+        self.assertEqual(edited["native"], 0)
+        self.assertEqual(edited["fb_route"], 604)
+
 if __name__ == "__main__":
     unittest.main()

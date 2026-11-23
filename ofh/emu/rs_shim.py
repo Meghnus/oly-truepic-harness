@@ -137,15 +137,59 @@ def _trapmsg(what, n, ad, pc):
     return 'misaligned %s u%d at %#x (pc=%#x)' % (what, 8 * n, ad, pc)
 
 
-# Extension point: reviewed range-split Image.dis overrides the engine may shortcut.  {(module, qualname): (source text, 'glob'|'attr', lo name,
-# side-cache attribute)}.  A function qualifies ONLY if its compiled code equals the reviewed text, so an edited copy is simply called through
-# Python (correct, slower).  Empty by default: every Image.dis is called through Python unless it is pyemu.Image.dis itself.
+# Opt-in extension point: the engine may SHORTCUT a range-split Image.dis override.  Typical case: an Image subclass whose dis() serves a window of
+# addresses outside the image (RAM code, a loader's buffer) from its own cache and sends every other address to the base pyemu.Image.dis.  The
+# shortcut mirrors exactly this shape inside the engine (outside [lo, lo+size): the base cache; inside: the side-cache dict, a miss calls your
+# function), which saves a Python call per step and keeps those steps native.  It is only applied to a function that YOU registered and whose
+# compiled code equals the reviewed source text you registered (an edited copy is simply called through Python: correct, slower).  Nothing is
+# registered by default, so by default every Image.dis other than pyemu.Image.dis itself is called through Python.
+#
+#     register_reviewed_dis("mymod", "Img.dis", SOURCE, lo=("glob", "WIN_LO"), size=0x1000, side_attr="wcache")
+#
+# SOURCE is the exact `def dis(self, va): ...` text (the function must be defined inside a class body); `lo` is an int, ("glob", name) = a module
+# global of the function, or ("attr", name) = an attribute of the image instance; `side_attr` names the instance dict used as the window cache; the
+# function must call the base dis as `<alias>.Image.dis(self, va)` where `alias` (default "E") is a global bound to the ofh.emu.pyemu module;
+# `context` = the import lines that precede the class in your module (they change how Python compiles calls on imported names).
 REVIEWED_DIS = {}
+_SIGS = {}
+
+
+def register_reviewed_dis(module, qualname, source, lo, size, side_attr, context="", alias="E"):
+    REVIEWED_DIS[(module, qualname)] = dict(source=source, lo=lo, size=int(size), side_attr=side_attr, context=context, alias=alias)
+    _SIGS.pop((module, qualname), None)
+
+
+def _code_sig(co):
+    return (co.co_code, co.co_consts, co.co_names, co.co_varnames, co.co_freevars, co.co_cellvars, co.co_argcount, co.co_kwonlyargcount,
+            co.co_flags, co.co_exceptiontable)
+
+
+def _reviewed_sig(key, rev):
+    if key not in _SIGS:
+        # compiled as a method of a class `Img` in a module that has the registered context imports, like the function it is compared with
+        text = rev["context"] + "class Img:\n" + "\n".join("    " + ln for ln in rev["source"].splitlines()) + "\n"
+        co = compile(text, "<reviewed %s.%s>" % key, "exec")
+        cls_co = next(c for c in co.co_consts if hasattr(c, "co_code"))
+        fco = next(c for c in cls_co.co_consts if hasattr(c, "co_code"))
+        _SIGS[key] = _code_sig(fco)
+    return _SIGS[key]
 
 
 def _dis_kind(func):
-    """None, or (lo_spec, size, side_attr) for a reviewed range-split dis override (see REVIEWED_DIS); called once per function by the engine"""
-    return None
+    """None, or (lo_spec, size, side_attr) for a registered, code-identical range-split dis override; called once per function by the engine"""
+    try:
+        key = (getattr(func, "__module__", None), getattr(func, "__qualname__", None))
+        rev = REVIEWED_DIS.get(key)
+        if rev is None or func.__globals__.get(rev["alias"]) is not sys.modules.get("ofh.emu.pyemu"):
+            return None
+        if _code_sig(func.__code__) != _reviewed_sig(key, rev):          # the LOADED code, not the file on disk
+            return None
+        lo = rev["lo"]
+        if isinstance(lo, (tuple, list)):
+            lo = ("glob", func.__globals__, lo[1]) if lo[0] == "glob" else ("attr", lo[1])
+        return (lo, rev["size"], rev["side_attr"])
+    except Exception:
+        return None
 
 
 def patch(E, cls=None):

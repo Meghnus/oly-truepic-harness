@@ -15,6 +15,14 @@ differ per body and per firmware version). The lane, difftest and method apply t
 Layout: everything importable lives under one package, `ofh` (`ofh.emu`, `ofh.mem`, `ofh.lane`, `ofh.difftest`), so nothing collides with other
 Python packages. Run from the repository root (the examples and tests add it to `sys.path` themselves); there is no pip package yet.
 
+## Origin and related projects
+
+This toolkit comes from [om10mi-mods](https://github.com/Meghnus/om10mi-mods), the firmware mod for the OM-D E-M10 Mark I. Many people asked for
+ports to other OM / Olympus cameras, so these are the tools we use ourselves: please use them for your own ports. The LUT / `.cube` / `.xmp`
+import (a web app and a builder, in development) will be linked from both projects when it is published.
+
+This repository: https://github.com/Meghnus/oly-truepic-harness (not published yet).
+
 ## What is in it
 
 | Directory | What |
@@ -23,7 +31,7 @@ Python packages. Run from the repository root (the examples and tests add it to 
 | `ofh/mem/` | `PageMem` (sparse memory with exact `dict` semantics, copy-on-write copies) and `shm` (a content-addressed store with read-only and copy-on-write `mmap` images shared between processes). |
 | `ofh/lane/` | A **parallel stage driver** with a **RAM gate**, per-stage scratch, an I/O audit, `cmp_runs` (token-normalised run comparison) and an **A/B** of the Rust core against Python. |
 | `ofh/difftest/` | **Lock-step dual stepper** (with dict-delta compare), run()-cut fuzz and random-instruction fuzz, memory and undo-journal fuzz. |
-| `docs/` | [method](docs/method.md), [emu](docs/emu.md), [lane](docs/lane.md), [difftest](docs/difftest.md), [profile](docs/profile.md), [porting](docs/porting.md), [compatibility](docs/COMPATIBILITY.md), [licence and leaks](docs/licence-and-leaks.md). |
+| `docs/` | [method](docs/method.md), [emu](docs/emu.md), [lane](docs/lane.md), [difftest](docs/difftest.md), [profile](docs/profile.md), [porting](docs/porting.md), [performance](docs/performance.md), [compatibility](docs/COMPATIBILITY.md), [licence and leaks](docs/licence-and-leaks.md). |
 | `examples/` | Six runnable examples with **no firmware** (synthetic snippets and random programs). |
 | `tests/`, `ofh/emu/rs_emu` | `python -m unittest discover -s tests` and `cargo test`; both pass with no firmware present. |
 | `tools/leakcheck.py` | The pre-push guard: forbidden files, blobs, address-like literals, and (`--stock FILE`) any 16-byte run shared with *your* stock image. |
@@ -58,6 +66,7 @@ python -m ofh.emu.build                             # optional: the Rust core (c
 OMH_RUST=1 python examples/01_loop.py           # the same example on the Rust core
 python examples/04_random_programs.py           # random programs in lock-step Rust vs Python
 python examples/06_dual_audit.py                # OMH_RUST=dual: every native step compared with Python
+python examples/bench/bench.py                  # firmware-free benchmark: Python vs Rust core (run() and step()), PageMem, shm store memory
 python examples/05_lane_demo.py --ab            # Rust vs Python A/B of a battery + run comparison
 (cd ofh/emu/rs_emu && cargo test)                   # Rust unit tests
 ```

@@ -40,6 +40,13 @@ class Examples(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
     @needs_rust
+    def test_bench_runs_and_rust_wins(self):
+        r = run("bench/bench.py", "--mb", "0.02", "--step-count", "5000", "--skip-shm")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        rows = {ln.split()[0]: ln.split() for ln in r.stdout.splitlines() if ln.split()[:1] in (["py-dict"], ["py-page"], ["rust"])}
+        self.assertEqual(set(rows), {"py-dict", "py-page", "rust"}, r.stdout)
+        self.assertGreater(float(rows["rust"][2].replace(",", "")), float(rows["py-dict"][2].replace(",", "")), "rust run() must beat python run()")
+    @needs_rust
     def test_examples_agree_on_rust(self):
         for ex in ("01_loop.py", "02_call_stub.py", "03_negative_control.py"):
             a, b = run(ex), run(ex, env={"OMH_RUST": "1"})
