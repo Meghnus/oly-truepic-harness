@@ -30,8 +30,8 @@ A pre-push hook is a good idea: `python tools/leakcheck.py --stock "$OMH_STOCK"`
 
 ## Credits (facts and ideas, no code copied)
 
-* **fishcu / oly_fw_analysis** (Apache-2.0): public documentation of the container format and checksum, the MN103 instruction-level analysis
-  of PEN-F, and the practice of keeping firmware local. Facts only.
+* **fishcu / oly_fw_analysis** (Apache-2.0): published facts about the container format and checksum, the MN103 instruction-level analysis
+  of PEN-F, and the practice of keeping firmware local. Facts only; nothing here depends on its tools.
 * **cmdada** (em10-fw and related work): E-M10 Mark I firmware facts. Facts only.
 * **flatpanda / om-emu** (MIT): the multi-body survey cited in `docs/COMPATIBILITY.md`. Facts only.
 * GNU binutils: only as an optional *external* disassembler you install yourself; nothing of it is included.

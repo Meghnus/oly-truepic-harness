@@ -1,4 +1,4 @@
-olympuscam-fw-harness
+oly-truepic-harness
 Copyright 2026 Meghnus
 
 Licence
@@ -8,9 +8,9 @@ contributions, which they license under the same Apache License, Version 2.0.
 
 Credits (facts and ideas only; no code from these projects is copied or linked)
 --------------------------------------------------------------------------------
-* fishcu / oly_fw_analysis (https://github.com/fishcu/oly_fw_analysis, Apache-2.0): public documentation of the Olympus update container and
-  its checksum, and MN103 instruction-level analysis of PEN-F firmware with a native-call harness. tools/leakcheck.py implements the
-  documented payload transform independently and cross-checks it against our own decoder.
+* fishcu / oly_fw_analysis (https://github.com/fishcu/oly_fw_analysis, Apache-2.0): published facts about the Olympus update container and
+  its checksum, and MN103 instruction-level analysis of PEN-F firmware with a native-call harness. This toolkit does not depend on its tools or
+  code; tools/leakcheck.py implements the published payload transform independently and cross-checks it against our own decoder.
 * cmdada (https://github.com/cmdada/em10-fw and related work): facts about the E-M10 Mark I firmware. Facts only.
 * flatpanda / om-emu (https://github.com/flatpanda/om-emu, MIT): an independent JavaScript emulator lab that runs MN10300 firmware of many
   Olympus / OM System bodies (CPU interpreter, modelled devices, the firmware's own kernel and GUI, patch overlays) and a survey of 32

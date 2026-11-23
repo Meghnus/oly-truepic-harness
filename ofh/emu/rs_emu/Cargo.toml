@@ -1,8 +1,8 @@
 [package]
-name = "olympuscam-fw-harness-rs-emu"
+name = "oly-truepic-harness-rs-emu"
 version = "0.1.0"
 edition = "2024"
-description = "olympuscam-fw-harness: MN10300 mnemonic-level CPU interpreter + PageMem memory in Rust (PyO3 module _rs_emu); optional accelerator for ofh/emu/pyemu.py"
+description = "oly-truepic-harness: MN10300 mnemonic-level CPU interpreter + PageMem memory in Rust (PyO3 module _rs_emu); optional accelerator for ofh/emu/pyemu.py"
 license = "Apache-2.0"
 publish = false
 

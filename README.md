@@ -1,9 +1,13 @@
-# olympuscam-fw-harness
+# oly-truepic-harness
 
 **Why this exists.** (1) To make firmware-mod testing on a PC much faster and much more trustworthy, so that a mod is checked, with
 negative controls, long before anything touches a camera, and so that this works across Olympus / OM System bodies, not just one.
 (2) To speed up porting: if you want to bring mods (the colour engine, menus, UI pages, ...) to another body, this gives you the emulator
 core, the parallel test lane and the method to verify your port. Contributions and ports are welcome.
+
+**Scope.** Designed to work across TruePic bodies that use the MN10300/AM33 core family; each body needs its own profile (addresses and tables
+differ per body and per firmware version). The lane, difftest and method apply to any body, including newer ARM-core bodies. See
+[docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for what is known per body.
 
 **Zero firmware is in this repository.** You run everything on your own, locally downloaded firmware; see
 [licence and leaks](docs/licence-and-leaks.md). **Caduceus developers: start at [docs/FOR-CADUCEUS.md](docs/FOR-CADUCEUS.md).**
@@ -60,7 +64,8 @@ python examples/05_lane_demo.py --ab            # Rust vs Python A/B of a batter
 
 ## Quick start on your own firmware
 
-1. Decode your firmware locally (container format and checksum: https://github.com/fishcu/oly_fw_analysis). Keep the result outside git.
+1. Decode your firmware locally with your own decoder, or with fishcu's [oly_fw_analysis](https://github.com/fishcu/oly_fw_analysis) (the container
+   format and checksum are published there; this toolkit does not depend on it). Keep the result outside git.
 2. `cp profiles/template.json profiles/my-body.json` and fill `image.base` (load address of the main code), `image.file`, and either
    `disassembler.command` (+ `line_regex`) or build a `ListingDisassembler` yourself. See [docs/profile.md](docs/profile.md).
 3. ```python
@@ -84,7 +89,7 @@ Lessons learned (e.g. "free space may be a runtime buffer", "stubbed services hi
 ## Want to port to another body?
 
 1. Check the CPU of your body's main code ([compatibility](docs/COMPATIBILITY.md#check-a-body-in-five-minutes-you-need-your-own-copy-of-its-firmware)).
-2. Decode **your own** firmware with fishcu's tools; keep it local.
+2. Decode **your own** firmware with your own decoder, or with fishcu's oly_fw_analysis; keep it local.
 3. Fill the profile from your own analysis.
 4. Run the examples, then load your image and call one small function you understand.
 5. Write your first **negative-controlled** check; scale up with the lane; prove the fast core with `ofh.lane.ab` / `OMH_RUST=dual`.
@@ -96,8 +101,8 @@ Coordinate through **issues / PRs here** or the **Caduceus Discord** (invite in 
 
 Apache-2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)); copyright 2026 Meghnus, contributors keep the copyright of their contributions under
 Apache-2.0. Credits for facts and ideas (no code copied):
-* **fishcu / oly_fw_analysis** (Apache-2.0): public documentation of the update container and checksum, and MN103 instruction-level analysis of
-  PEN-F firmware with a native-call harness; the model for keeping firmware local.
+* **fishcu / oly_fw_analysis** (Apache-2.0): published facts about the update container and checksum, and MN103 instruction-level analysis of
+  PEN-F firmware with a native-call harness. We depend on none of its tools or code; the model for keeping firmware local.
 * **cmdada** (em10-fw and related E-M10 work): facts about the E-M10 Mark I firmware (facts only).
 * **flatpanda / om-emu** (MIT): an independent JavaScript emulator lab that runs MN10300 firmware of many bodies (CPU interpreter, modelled
   devices, the firmware's own kernel and GUI, patch overlays) and a 32-file firmware survey; we cite its survey and per-body status in

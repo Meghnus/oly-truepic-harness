@@ -1,6 +1,6 @@
 # For Caduceus developers
 
-Hi! This is **olympuscam-fw-harness**: a small, firmware-free toolkit for checking Olympus / OM System firmware mods **on a PC, before a
+Hi! This is **oly-truepic-harness**: a small, firmware-free toolkit for checking Olympus / OM System firmware mods **on a PC, before a
 camera is involved**, and for speeding up ports to other bodies. It grew out of the E-M10 Mark I mod work, but nothing in it is specific to
 one body, and it contains **no firmware** (you use your own download, locally).
 
@@ -33,7 +33,7 @@ See [COMPATIBILITY.md](COMPATIBILITY.md) for the full table with sources. In sho
 ## How to start (15 minutes, no firmware)
 
 ```
-git clone <this repository> && cd olympuscam-fw-harness
+git clone <this repository> && cd oly-truepic-harness
 python -m unittest discover -s tests          # about a minute
 python examples/01_loop.py                    # the interpreter
 python examples/02_call_stub.py               # a stubbed call with the real stack discipline
@@ -43,7 +43,7 @@ python -m ofh.emu.build                       # optional: the Rust core (needs c
 python examples/05_lane_demo.py --ab          # Rust vs Python on the same battery, then the run comparison
 ```
 
-Then, with your own firmware: decode it (fishcu's tools document the container), copy `profiles/template.json`, fill in the load base and a
+Then, with your own firmware: decode it with your own decoder or fishcu's oly_fw_analysis (which publishes the container format), copy `profiles/template.json`, fill in the load base and a
 disassembler command, load your image and call one small function you understand. [docs/porting.md](porting.md) has the steps.
 
 ## How to contribute

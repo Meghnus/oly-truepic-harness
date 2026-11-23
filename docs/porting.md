@@ -6,8 +6,8 @@ checks on your PC.
 
 1. **Check the CPU** (`docs/COMPATIBILITY.md`, "Check a body in five minutes"). MN10300 main code: `ofh/emu/` applies. Otherwise only the lane,
    difftest scaffolding and the method (`docs/method.md`) apply.
-2. **Get and decode your own firmware.** Download it from the vendor, decode the container with fishcu's tools
-   (https://github.com/fishcu/oly_fw_analysis, `docs/format/CONTAINERS.md`) or any decoder you trust. Keep everything local.
+2. **Get and decode your own firmware.** Download it from the vendor and decode the container with your own decoder, or with fishcu's
+   oly_fw_analysis (https://github.com/fishcu/oly_fw_analysis, `docs/format/CONTAINERS.md` publishes the format). Keep everything local.
 3. **Fill a profile** (`docs/profile.md`): the load base of the main code, a disassembler command (or your own listing), `ret_kind` for
    out-of-image stubs.
 4. **Run the examples** against nothing (`python examples/01_loop.py ...`) and then write a 10-line script that loads *your* image through the

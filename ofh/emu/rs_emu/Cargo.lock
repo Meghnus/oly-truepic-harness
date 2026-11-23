@@ -39,7 +39,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "olympuscam-fw-harness-rs-emu"
+name = "oly-truepic-harness-rs-emu"
 version = "0.1.0"
 dependencies = [
  "pyo3",
