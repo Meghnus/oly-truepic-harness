@@ -1,0 +1,33 @@
+om10mi-harness (working name)
+Copyright 2026 Meghnus
+
+Licence
+-------
+All code and documentation in this repository: Apache License, Version 2.0 (see LICENSE).
+
+Credits (facts and ideas only; no code from these projects is copied or linked)
+--------------------------------------------------------------------------------
+* fishcu / oly_fw_analysis (https://github.com/fishcu/oly_fw_analysis, Apache-2.0): public documentation of the Olympus update container
+  and its checksum, and MN103 instruction-level analysis of PEN-F firmware. tools/leakcheck.py implements the documented payload transform
+  independently and cross-checks it against our own decoder.
+* cmdada (https://github.com/cmdada/em10-fw and related work): facts about the E-M10 Mark I firmware.
+* flatpanda / om-emu (https://github.com/flatpanda/om-emu, MIT): the multi-body firmware survey cited in docs/COMPATIBILITY.md.
+* matozoid / em10_1, cakelesscoder / caduceus-ep7, androidfanman / caduceus-om3: public notes cited in docs/COMPATIBILITY.md.
+* GNU binutils (GPL): optional EXTERNAL disassembler that you install yourself and that this toolkit runs as a separate program.
+  Nothing of binutils is included, linked or derived here.
+* Rust crates (pyo3, rustc-hash and their dependencies) are fetched by cargo from crates.io under their own licences, pinned in
+  emu/rs_emu/Cargo.lock; they are not redistributed in this repository.
+
+THIS PROJECT IS UNOFFICIAL. It is not made, endorsed or supported by OM Digital Solutions Corporation or Olympus. "Olympus", "OM System",
+"OM-D", "PEN" and "TruePic" are trademarks of their owners and are used only to identify things.
+
+Firmware
+--------
+Camera firmware is the property of OM Digital Solutions Corporation. This repository contains NO firmware, no decoded image, no dump, no
+disassembly listing, no patch list and no body-specific table. You use it with firmware you have downloaded yourself, locally. Do not
+redistribute firmware or anything derived from it. Run tools/leakcheck.py before every push.
+
+No warranty
+-----------
+Nothing here writes to a camera. Never flash an image because an emulator or this toolkit passed: a passing emulator is evidence, not proof,
+and modified firmware can brick a camera.

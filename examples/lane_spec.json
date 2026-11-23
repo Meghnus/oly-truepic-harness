@@ -1,0 +1,10 @@
+{
+  "name": "synthetic demo battery",
+  "stages": [
+    {"name": "prep", "cmd": ["python", "-u", "stages/s_prep.py"], "est_mb": 200, "est_min": 1},
+    {"name": "loop", "cmd": ["python", "-u", "stages/s_loop.py"], "deps": ["prep"], "est_mb": 300, "est_min": 1},
+    {"name": "stub", "cmd": ["python", "-u", "stages/s_stub.py"], "deps": ["prep"], "est_mb": 300, "est_min": 1}
+  ],
+  "io_roots": ["."],
+  "watch_files": ["stages/*.py"]
+}

@@ -1,0 +1,29 @@
+# Never commit firmware, decodes, dumps, disassembly or anything derived from them (see tools/leakcheck.py, docs/licence-and-leaks.md)
+*.BIN
+*.bin
+*.dec
+*.part
+*.dmp
+*.dump
+*.img
+*.rom
+*.elf
+*.dis
+*.lst
+*dump*
+*decoded*
+
+# build outputs and local caches (decoded images live in these: never publish)
+emu/rs_emu/target/
+emu/_rs_emu*.pyd
+emu/_rs_emu*.so
+emu/_rs_emu.build.json
+.omh_cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# your own profiles hold your analysis data: keep them local
+profiles/*
+!profiles/template.json
+!profiles/README.md

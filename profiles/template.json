@@ -1,0 +1,17 @@
+{
+  "_comment": "Copy this file, fill it from YOUR OWN analysis of YOUR OWN firmware, keep the copy out of git. The toolkit ships no body-specific value.",
+  "name": "",
+  "isa": "mn10300",
+  "image": {
+    "base": null,
+    "read_floor": null,
+    "file": null
+  },
+  "ret_kind": {},
+  "disassembler": {
+    "command": [],
+    "line_regex": null,
+    "cache_dir": null
+  },
+  "stubs": {}
+}
