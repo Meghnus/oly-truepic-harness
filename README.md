@@ -21,7 +21,7 @@ This toolkit comes from [om10mi-mods](https://github.com/Meghnus/om10mi-mods), t
 ports to other OM / Olympus cameras, so these are the tools we use ourselves: please use them for your own ports. The LUT / `.cube` / `.xmp`
 import (a web app and a builder, in development) will be linked from both projects when it is published.
 
-This repository: https://github.com/Meghnus/oly-truepic-harness (not published yet).
+This repository: https://github.com/Meghnus/oly-truepic-harness
 
 ## What is in it
 
